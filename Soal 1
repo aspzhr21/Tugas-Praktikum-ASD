@@ -1,0 +1,365 @@
+#include <iostream>
+
+using namespace std;
+
+// Memberi nama struct pointer Node sebagai adress.
+typedef struct Node *address;
+
+/*
+    Menyusun struktur Data dengan atribut nama, nim, kelas, dan nilai.
+*/
+struct Data {
+  string nama;
+  string nim;
+  string kelas;
+  int nilai;
+};
+/*
+    Mendefinisikan struct Node
+    dengan atribut data, dan next
+*/
+struct Node {
+  Data data;
+  address next;
+};
+/*
+    Mendefinisikan struct List
+    dengan properti first dan jumlahData
+*/
+struct List {
+  address first;
+  int jumlahData;
+};
+
+/*
+    Fungsi untuk menampilkan data list
+    parameter List
+*/
+void printList(List list) {
+  // variable current = first
+  // untuk traversing
+  address current = list.first;
+  int counter = 1; // sebagai counter
+
+  cout << "===============================\n";
+  cout << "Jumlah data :" << list.jumlahData << endl;
+  cout << "===============================\n";
+  while (current != NULL) { // traversing untuk menampilkan data
+    cout << "(" << counter << ")\n";
+    cout << "Nama   : " << current->data.nama << endl;
+    cout << "NIM    : " << current->data.nim << endl;
+    cout << "Kelas  : " << current->data.kelas << endl;
+    cout << "Nilai  : " << current->data.nilai << endl << endl;
+    current = current->next;
+    counter++;
+  }
+
+  cout << "===============================\n\n";
+}
+
+/*
+    Fungsi untuk menginput data
+    return Data
+*/
+Data inputData() {
+  Data newData;
+
+  cout << "Masukkan nama  : ";
+  cin >> newData.nama;
+  cout << "Masukkan nim   : ";
+  cin >> newData.nim;
+  cout << "Masukkan kelas : ";
+  cin >> newData.kelas;
+  cout << "Masukkan nilai : ";
+  cin >> newData.nilai;
+
+  return newData;
+}
+
+/*
+    Fungsi untuk membuat node baru
+    return address
+*/
+address createNewNode() {
+  address newNode = new Node();
+  Data newData = inputData();
+  newNode->data = newData;
+  return newNode;
+}
+
+/*
+    Fungsi untuk mengosongkan sebuah list
+    parameter pointer List
+*/
+void createEmpty(List *L) {
+  (*L).first = NULL;
+  (*L).jumlahData = 0;
+}
+
+/*
+    Fungsi untuk memasukkan node baru pada awal list
+    parameter pointer List
+*/
+void insertFirst(List *L) {
+  address newNode = createNewNode(); // membuat new node
+
+  (*L).jumlahData++; // menambahkan jumlahData + 1
+
+  // jika node first = NULL, maka first = newNode
+  if ((*L).first == NULL) {
+    (*L).first = newNode;
+    return;
+  }
+
+  // menempatkan node baru ke sebelum first
+  newNode->next = (*L).first;
+  (*L).first = newNode;
+}
+
+/*
+    Fungsi untuk memasukkan node baru pada akhir list
+    parameter pointer List
+*/
+void insertLast(List *L) {
+  address newNode = createNewNode(); // membuat new node
+
+  (*L).jumlahData++; // menambahkan todalData + 1
+
+  // jika node first = NULL, maka first = newNode
+  if ((*L).first == NULL) {
+    (*L).first = newNode;
+    return;
+  }
+
+  // membuat pointer current = first
+  address current = (*L).first;
+
+  // pointer current akan traverse kekanan hingga
+  // current->next = NULL
+  while (current->next != NULL) {
+    current = current->next;
+  }
+
+  // karena current sudah berada pada sebelum NULL maka,
+  // mengubah current->next = newNode
+  current->next = newNode;
+}
+
+/*
+    Fungsi untuk memasukkan node baru pada tengah list
+    parameter pointer List
+*/
+void insertAfter(List *L) {
+  address newNode = createNewNode(); // membuat new node
+
+  // jika node first = NULL, maka first = newNode
+  if ((*L).first == NULL) {
+    (*L).first = newNode;
+    (*L).jumlahData++;
+    return;
+  }
+
+  // membuat pointer current = first
+  address current = (*L).first;
+
+  // membuat findIndex sebagai index mid yang didapat
+  // dari jumlah data list / 2
+  int findIndex = (*L).jumlahData / 2;
+  int index = 1; // var. index digunakan sebagai counter
+
+  while (current != NULL && index != findIndex) {
+    current = current->next;
+    index++;
+  }
+
+  // pada saat ini, current sudah ada di tengah
+  // maka selipkan new node setelah current
+  newNode->next = current->next;
+  current->next = newNode;
+
+  // jumlah data ditambah 1
+  (*L).jumlahData++;
+}
+
+/*
+    Fungsi untuk mencari suatu data ada atau tidak
+    parameter pointer List
+*/
+void findSudahKerjaLaki(List list) {
+  // input findNim yang digunakan untuk menyimpan
+  // nim yang ingin dicari
+  string findNim;
+  cout << "Masukkan NIM yang ingin dicari: ";
+  cin >> findNim;
+
+  // membuat variabel current = first
+  address current = list.first;
+
+  // traversing current ke kanan jika tidak NULL dan current nim
+  // tidak sama dengan findNim
+  while (current != NULL && current->data.nim != findNim) {
+    current = current->next;
+  }
+
+  // jika current NULL, artinya nim tidak ditemukan
+  if (current == NULL) {
+    cout << "Data dengan NIM " << findNim << " tidak ditemukan!\n";
+  } else { // selain itu, nim ditemukan
+    cout << "Data ditemukan: \n";
+    cout << "Nama   : " << current->data.nama << endl;
+    cout << "NIM    : " << current->data.nim << endl;
+    cout << "Kelas  : " << current->data.kelas << endl;
+    cout << "Nilai  : " << current->data.nilai << endl << endl;
+  }
+}
+
+/*
+    Fungsi untuk mengurutkan list
+        dari terbesar hingga terkecil.
+    parameter pointer List
+*/
+void sortList(List L) {
+  // variabel current = first
+  // untuk traversing pertama
+  address current = L.first;
+  address index = NULL; // untuk traversing kedua
+  Data tmp;             // untuk menampung data yang akan di swap
+
+  // jika list kosong, maka akan return
+  if (current == NULL) {
+    return;
+  }
+
+  // sorting
+  while (current != NULL) {
+    index = current->next;
+
+    while (index != NULL) {
+      if (current->data.nim < index->data.nim) {
+        tmp = current->data;
+        current->data = index->data;
+        index->data = tmp;
+      }
+      index = index->next;
+    }
+
+    current = current->next;
+  }
+
+  // menampilkan data ke layar
+  printList(L);
+}
+
+/*
+    Fungsi untuk menghapus data tengah setiap
+        kali ditemukan nilai UTS dibawah 50.
+    parameter pointer List
+*/
+void yaHapus(List *L) {
+  // membuat variabel current, tmp, dan prev
+  // current untuk traversing
+  // tmp untuk menyimpan data sementara untuk di delete
+  // prev digunakan untuk menyimpan node sebelum current
+  address current = (*L).first, tmp, prev;
+
+  // traverse current ke kanan jika tidak NULL dan
+  // nilai lebih dari sama dengan 50
+  while (current != NULL && current->data.nilai >= 50) {
+    current = current->next;
+  }
+
+  // current tidak NULL, yang artinya datanya
+  // terdapat nilai 50
+  if (current != NULL) {
+    // kita akan traverse lagi menggunakan current
+    current = (*L).first;
+
+    // variabel findIndex utk mencari index tengah
+    // dengan cara jumlah data / 2
+    int findIndex = (*L).jumlahData / 2;
+    int index = 1; // variabel index sebagai counter
+
+    // jika jumlah datanya ganjil, maka findindex ditambah 1
+    if ((*L).jumlahData % 2 != 0) {
+      findIndex++;
+    }
+
+    // traverse ke kanan jika tidak NULL dan index tidak
+    // sama dengan findIndex
+    while (current != NULL && index != findIndex) {
+      prev = current;
+      current = current->next;
+      index++;
+    }
+
+    // melakukan deallocation
+    tmp = current;
+    prev->next = current->next;
+    delete tmp;        // menghapus node pada memori
+    (*L).jumlahData--; // mengurangi jumlah data dengan 1
+
+    cout << "Terdapat nilai yang dibawah 50, menghapus data tengah...\n";
+
+    printList(*L);
+  }
+}
+
+int main() {
+  // membuat variabel list
+  List list;
+  // membuat list kosong pada variabel list
+  createEmpty(&list);
+
+  char pilihan;
+  
+  do {
+    cout << "======================\n";
+    cout << "PROGRAM SLL SLEBEW 1.0\n";
+    cout << "======================\n";
+    cout << "1. Insert First\n";
+    cout << "2. Insert Last\n";
+    cout << "3. Insert Mid\n";
+    cout << "4. Fungsi yaHapus\n";
+    cout << "5. Urutkan NIM desc.\n";
+    cout << "6. Cari data\n";
+    cout << "7. Print data\n";
+    cout << "x. Keluar\n";
+    cout << "======================\n";
+    cout << "Pilih menu: ";
+    cin >> pilihan;
+    getchar();
+
+    switch (pilihan) {
+    case '1':
+      insertFirst(&list);
+      break;
+    case '2':
+      insertLast(&list);
+      break;
+    case '3':
+      insertAfter(&list);
+      break;
+    case '4':
+      yaHapus(&list);
+      break;
+    case '5':
+      sortList(list);
+      break;
+    case '6':
+      findSudahKerjaLaki(list);
+      break;
+    case '7':
+      printList(list);
+      break;
+    case 'x':
+      cout << "Terimakasih, sampai jumpa :)\n";
+      break;
+    default:
+      cout << "Input yang anda masukkan salah! Silahkan coba lagi.\n";
+      break;
+    }
+
+  } while (pilihan != 'x');
+
+  return 0;
+}
